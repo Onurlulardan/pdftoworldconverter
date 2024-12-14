@@ -6,7 +6,7 @@ const pdf = require('pdf-parse');
 const { Document, Packer, Paragraph, PageBreak } = require('docx');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 
@@ -14,11 +14,11 @@ app.use(express.static('public'));
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const dir = './uploads';
+        const dir = path.join(__dirname, 'uploads');
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
-        cb(null, 'uploads/');
+        cb(null, dir);
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
@@ -75,7 +75,7 @@ app.post('/convert', upload.single('pdfFile'), async (req, res) => {
             }]
         });
 
-        const outputDir = './output';
+        const outputDir = path.join(__dirname, 'output');
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir);
         }
